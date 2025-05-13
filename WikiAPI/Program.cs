@@ -3,7 +3,7 @@ using WikiAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=artigos.db"));
+builder.Services.AddDbContext<ContextoWiki>(options => options.UseSqlite("Data Source=artigos.db"));
 
 
 // Add services to the container.
