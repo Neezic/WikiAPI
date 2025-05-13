@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WikiAPI;
+using WikiAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+using (var escopo = app.Services.CreateScope())
+{
+    var servicos = escopo.ServiceProvider;
+    var contexto = servicos.GetRequiredService<ContextoWiki>();
+    contexto.Database.EnsureCreated();
+}
 
 
 app.MapGet("/weatherforecast", () => "Funcionando!");
