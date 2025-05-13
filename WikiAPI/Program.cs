@@ -15,6 +15,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 builder.Services.AddDbContext<ContextoWiki>(options => 
     options.UseSqlite(builder.Configuration.GetConnectionString("ContextoWiki")));
 
