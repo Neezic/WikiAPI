@@ -2,11 +2,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WikiAPI
 {
-    public class AppDbContext : DbContext
+    public class ContextoWiki : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public ContextoWiki(DbContextOptions<ContextoWiki> options) : base(options) { }
 
-        public DbSet<Artigo> TabelaProdutos => Set<Artigo>();
+        public DbSet<Artigo> TabelaArtigo => Set<Artigo>();
 
     }
 
