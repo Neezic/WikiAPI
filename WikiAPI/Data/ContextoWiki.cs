@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WikiAPI.Models;
 
 namespace WikiAPI.Data
@@ -13,7 +12,7 @@ namespace WikiAPI.Data
         }
 
         public DbSet<Artigo> Artigo => Set<Artigo>();
-        public DbSet<Usuario> UsuarioAplicacao { get; set; }
+        public DbSet<Usuario> Usuario => Set<Usuario>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

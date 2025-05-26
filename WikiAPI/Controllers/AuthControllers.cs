@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -28,14 +29,14 @@ namespace WikiAPI.Controllers
         public async Task<IActionResult> Registrar([FromBody] RegistroModel modelo)
         {
             //verifica se o email já existe
-            if (_contexto.Usuarios.Any(u => u.Email == modelo.Email))
+            if (_contexto.Usuario.Any(u => u.Email == modelo.Email))
                 return BadRequest("Email já cadastrado");
 
             var usuario = new Usuario
             {
                 Nome = modelo.Nome,
                 Email = modelo.Email,
-                SenhaHash = HashSenha(modelo.SenhaHash),
+                senhaHash = HashSenha(modelo.Senha),
                 Perfil = "Leitor" // Padrão é Leitor
             };
             _contexto.Usuario.Add(usuario);
@@ -44,13 +45,13 @@ namespace WikiAPI.Controllers
             return Ok(new { mensagem = "Usuario Registrado com sucesso!" });
 
         }
-        [HttpPost(Login)]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel modelo)
         {
-            var usuario = await _contexto.Usuarios
+            var usuario = await _contexto.Usuario
                 .FirstOrDefaultAsync(u => u.Email == modelo.Email);
-            if (usuario == null || !VerificarSenha(modelo.Senha, usuario.SenhaHash))
-                return Unathorized("Credenciais Inválidas");
+            if (usuario == null || !VerificarSenha(modelo.Senha, usuario.senhaHash))
+                return new ForbidResult();
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier,usuario.Id.ToString()),
@@ -59,7 +60,7 @@ namespace WikiAPI.Controllers
                 new Claim("Perfil", usuario.Perfil)
             };
             var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAutheticationDefaults.AuthenticationScheme
+                claims, CookieAuthenticationDefaults.AuthenticationScheme
             );
             var authProperties = new AuthenticationProperties
             {
@@ -67,7 +68,7 @@ namespace WikiAPI.Controllers
                 IsPersistent = true
             };
             await HttpContext.SignInAsync(
-                CokkieAuthenticationDefaults.AuthenticationScheme,
+                CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties
             );
@@ -96,20 +97,20 @@ namespace WikiAPI.Controllers
         {
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(senha));
         }
-        private bool VerificarSenha(string senha string hash)
+        private bool VerificarSenha(string senha, string hash)
         {
             return HashSenha(senha) == hash;
         }
 
         public class RegistroModel
         {
-            public string Nome { get; set; }
-            public string Email { get; set; }
-            public string Senha { get; set; }
+            public required string Nome { get; set; }
+            public required string Email { get; set; }
+            public required string Senha { get; set; }
         }
         public class LoginModel {
-            public string Email { get; set; }
-            public string Senha { get; set; }
+            public required string Email { get; set; }
+            public required string Senha { get; set; }
         }
     }
 }

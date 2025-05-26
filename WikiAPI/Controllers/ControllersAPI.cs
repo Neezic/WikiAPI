@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using WikiAPI.Data;
 using WikiAPI.Models;
 
@@ -19,27 +21,10 @@ namespace WikiAPI.Controllers
         {
             _contexto = contexto;
         }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Artigo>>> ObterArtigos()
-        {
-            return await _contexto.Artigo
-            .Include(a => a.Usuario)
-            .Select(a => new ArtigoDto
-            {
-                Id = a.Id,
-                Titulo = a.Titulo,
-                Conteudo = a.Conteudo,
-                DataCriacao = a.DataCriacao,
-                DataAtualizacao = a.DataAtualizacao,
-                Autor = a.Usuario != null ? a.Usuario.Nome : "Sistema"
-            })
-            ToListAsync();
-
-        }
         [HttpGet("{id}")]
         public async Task<ActionResult<ArtigoDto>> ObterArtigo(int id)
         {
-            var artigo = await _contexto.Artigos
+            var artigo = await _contexto.Artigo
             .Include(a => a.Usuario)
             .Where(a => a.Id == id)
             .Select(a => new ArtigoDto
@@ -66,10 +51,10 @@ namespace WikiAPI.Controllers
             if (id != artigo.Id) {
                 return BadRequest();
             }
-            var artigoExiste = await _contexto.Artigos.FindAsync(id);
+            var artigoExiste = await _contexto.Artigo.FindAsync(id);
             if (artigoExiste == null) return NotFound();
-            var usuarioId = int.Parse(User.FindFirst(ClaimsTypes.Name Identifier)?.Value);
-            var usuario = await _contexto.Usuarios.FindAsync(usuarioId);
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var usuario = await _contexto.Usuario.FindAsync(usuarioId);
 
             artigoExiste.Titulo = artigo.Titulo;
             artigoExiste.Conteudo = artigo.Conteudo;
@@ -97,8 +82,8 @@ namespace WikiAPI.Controllers
         [Authorize(Policy = "Editor")]
         public async Task<ActionResult<Artigo>> CriarArtigo(Artigo artigo)
         {
-            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.Name Identifier)?.Value);
-            var usuario = await _contexto.Usuarios.FindAsync(UsuarioId);
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var usuario = await _contexto.Usuario.FindAsync(usuarioId);
             artigo.DataCriacao = DateTime.UtcNow;
             _contexto.Artigo.Add(artigo);
             await _contexto.SaveChangesAsync();
@@ -127,11 +112,11 @@ namespace WikiAPI.Controllers
     public class ArtigoDto
     {
         public int Id { get; set; }
-        public string Titulo { get; set; }
-        public string Conteudo { get; set; }
+        public required string Titulo { get; set; }
+        public required string Conteudo { get; set; }
         public DateTime DataCriacao { get; set; }
         public DateTime? DataAtualizacao { get; set; }
-        public string Autor { get; set; }
+        public required string Autor { get; set; }
     }
     
     

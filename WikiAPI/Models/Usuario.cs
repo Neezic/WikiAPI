@@ -7,11 +7,11 @@ namespace WikiAPI.Models
 {
     public class Usuario
     {
-        public int id { get; set; }
-        public string Nome { get; set; }
-        public string Email { get; set; }
-        public string senhaHash { get; set; }
-        public string Perfil { get; set; }
+        public int Id { get; set; }
+        public required string Nome { get; set; }
+        public required string Email { get; set; }
+        public required string senhaHash { get; set; }
+        public required string Perfil { get; set; }
         // Se é leitor ou editor.
     }
 }

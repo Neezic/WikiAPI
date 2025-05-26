@@ -5,12 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikiAPI;
+using WikiAPI.Data;
 
 #nullable disable
 
 namespace WikiAPI.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ContextoWiki))]
     [Migration("20250512175625_Inicial")]
     partial class Inicial
     {
