@@ -12,7 +12,7 @@ using WikiAPI.Models;
 namespace WikiAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/api/[controller]")]
     public class ControllersAPI : ControllerBase
     {
         private ContextoWiki _contexto;

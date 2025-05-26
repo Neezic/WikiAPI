@@ -14,7 +14,7 @@ using WikiAPI.Data;
 namespace WikiAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/api/[controller]")]
     public class AuthControllers : ControllerBase
     {
         private readonly ContextoWiki _contexto;

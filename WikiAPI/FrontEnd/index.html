@@ -1,73 +1,145 @@
 <!DOCTYPE html>
-    <html lang="pt-br">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>WikiAPI</title>
-            <link rel="stylesheet" href="../FrontEnd/style.css">
-        </head>
-        <body>
-            <header>
-                <div class="container header-container"></div>
-                <h1>WikiAPI</h1>
-                <nav>
-                    <ul>
-                        <li><a href="#" id="home-link">Inicio</a></li>
-                        <li><a href="#" id="about-link">Sobre</a></li>
-                        <div class="auth-buttons" id="auth-buttons">
-                        <button id="login-btn"> Login</button>
-                        <button id="register-btn"> Registrar</button>
-                        </div>
-                        <div class="user-info" id="user-info" style="display: none;">
-                            <span id="user-email"></span>
-                            <button id="logout-btn">Sair</button>
-                            <button id="create-article-btn" style="display: none;">Criar Artigo</button>
-                        </div>
-                    </ul>
-                </nav>
-            </header>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WikiAPI</title>
+    <link rel="stylesheet" href="../FrontEnd/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container header-container"></div>
+      <h1>WikiAPI</h1>
+      <nav>
+        <ul>
+          <li><a href="#" id="home-link">Inicio</a></li>
+          <li><a href="#" id="about-link">Sobre</a></li>
+          <div class="auth-buttons" id="auth-buttons">
+            <button id="login-btn">Login</button>
+            <button id="register-btn">Registrar</button>
+          </div>
+          <div class="user-info" id="user-info" style="display: none">
+            <span id="user-email"></span>
+            <button id="logout-btn">Sair</button>
+            <button id="create-article-btn" style="display: none">
+              Criar Artigo
+            </button>
+          </div>
+        </ul>
+      </nav>
+    </header>
 
-            <main class="container">
-                <section id="home-section">
-                    <h2>Artigos Recentes</h2>
-                    <div class="articles-container" id="articles-container">
-
-                    </div>
-                </section>
-                <section id="about-section" style="display: none;">
-                    <h2>Sobre a Wiki</h2>
-                    <p>Esta é uma plataforma de conhecimento colaborativo onde você pode encontrar e com
-                    partilhar artigos sobre diversos temas.</p>
-                    <p>Usuários registrados podem ler artigos, 
-                    enquanto editores podem criar, editar e excluir conteúdo.</p>
-                </section>
-                <section id="article-detail-section" style="display: none;">
-                    <h2 id="article-detail-title"></h2>
-                    <div>
-                        <span id="article-detail-author"></span>
-                        <span id="article-detail-date"></span>
-                        <div id="article-actions" class="article-actions" style="display: none;">
-                            <button id="edit-article-btn" class="btn btn-primary">Editar</button>
-                            <button id="delete-article-btn" class="btn btn-danger">Excluir</button>
-                        </div>
-                    </div>
-                    <div id="article-detail-content" style="margin-top: 1rem;"></div>
-                </section>
-            </main>
-            <div class="modal" id="login-modal">
-                <div class="modal-content">
-                    <h2>Login</h2>
-                    <form id="login-form"></form>
-                    <div class="form-group">
-                        <label for="login-email">Email:</label>
-                        <input type="email"
-                    </div>
-                </div>
-            </div>
-
-            <footer>
-                <div class="container"></div>
-                <p>&copy ; 2025 WikiAPI. Todos os direitos reservados.</p>
-            </footer>
-        </body>
-    </html>
+    <main class="container">
+      <section id="home-section">
+        <h2>Artigos Recentes</h2>
+        <div class="articles-container" id="articles-container"></div>
+      </section>
+      <section id="about-section" style="display: none">
+        <h2>Sobre a Wiki</h2>
+        <p>
+          Esta é uma plataforma de conhecimento colaborativo onde você pode
+          encontrar e com partilhar artigos sobre diversos temas.
+        </p>
+        <p>
+          Usuários registrados podem ler artigos, enquanto editores podem criar,
+          editar e excluir conteúdo.
+        </p>
+      </section>
+      <section id="article-detail-section" style="display: none">
+        <h2 id="article-detail-title"></h2>
+        <div>
+          <span id="article-detail-author"></span>
+          <span id="article-detail-date"></span>
+          <div
+            id="article-actions"
+            class="article-actions"
+            style="display: none"
+          >
+            <button id="edit-article-btn" class="btn btn-primary">
+              Editar
+            </button>
+            <button id="delete-article-btn" class="btn btn-danger">
+              Excluir
+            </button>
+          </div>
+        </div>
+        <div id="article-detail-content" style="margin-top: 1rem"></div>
+      </section>
+    </main>
+    <div class="modal" id="login-modal">
+      <div class="modal-content">
+        <h2>Login</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" required />
+          </div>
+          <div class="form-group">
+            <label for="Login-email">Email:</label>
+            <input type="email" id="login-email" required />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-danger" id="cancel-login">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success">Entrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal" id="register-modal">
+      <div class="modal-content">
+        <h2>Registrar</h2>
+        <form id="register-form">
+          <div class="form-group">
+            <label for="register-name">Nome:</label>
+            <input type="text" id="register-name" required />
+          </div>
+          <div class="form-group">
+            <label for="register-email">Email:</label>
+            <input type="email" id="register-email" required />
+          </div>
+          <div class="form-group">
+            <label for="register-password">Senha:</label>
+            <input type="password" id="register-password" required />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-danger" id="cancel-register">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success">Registrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal" id="article-modal">
+      <div class="modal-content">
+        <h2 id="article-modal-title">Criar Novo Artigo</h2>
+        <form id="article-form">
+          <input type="hidden" id="article-id" />
+          <div class="form-group">
+            <label for="article-title">Título:</label>
+            <input type="text" id="article-title" required />
+          </div>
+          <div class="form-group">
+            <label for="article-content">Conteúdo:</label>
+            <textarea id="article-content" required></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-danger" id="cancel-article">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success" id="save-article">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <footer>
+      <div class="container"></div>
+      <p>&copy ; 2025 WikiAPI. Todos os direitos reservados.</p>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
