@@ -10,7 +10,7 @@ using WikiAPI.Data;
 namespace WikiAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthControllers : ControllerBase
     {
         private readonly ContextoWiki _contexto;
@@ -23,6 +23,9 @@ namespace WikiAPI.Controllers
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar([FromBody] RegistroModel modelo)
         {
+            if (modelo == null)
+                return BadRequest("Dados inválidos");
+
             if (_contexto.Usuario.Any(u => u.Email == modelo.Email))
                 return BadRequest("Email já cadastrado");
 
@@ -43,38 +46,41 @@ namespace WikiAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel modelo)
         {
+            // Validação explícita
+            if (modelo == null)
+                return BadRequest("Dados inválidos");
+
+            if (string.IsNullOrEmpty(modelo.Email))
+                return BadRequest("Email é obrigatório");
+
+            if (string.IsNullOrEmpty(modelo.Senha))
+                return BadRequest("Senha é obrigatória");
+
             var usuario = await _contexto.Usuario
-                .FirstOrDefaultAsync(u => u.Email == modelo.Email);
-                
+            .FirstOrDefaultAsync(u => u.Email == modelo.Email);
+
             if (usuario == null || !VerificarSenha(modelo.Senha, usuario.senhaHash))
                 return Unauthorized("Credenciais inválidas");
 
+            // Criação do cookie de autenticação
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Email, usuario.Email),
-                new Claim(ClaimTypes.Name, usuario.Nome),
-                new Claim("Perfil", usuario.Perfil)
+                    {
+            new Claim(ClaimTypes.Email, usuario.Email),
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new Claim("Perfil", usuario.Perfil)
             };
 
-            var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
             await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                new AuthenticationProperties
-                {
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(3),
-                    IsPersistent = true
-                });
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(new ClaimsIdentity(claims)),
+            new AuthenticationProperties { IsPersistent = true });
 
-            return Ok(new
-            {
+            return Ok(new {
                 usuario.Email,
                 usuario.Nome,
-                usuario.Perfil
+                Profile = usuario.Perfil
             });
+        
         }
 
         [HttpPost("logout")]
@@ -88,7 +94,31 @@ namespace WikiAPI.Controllers
         [HttpGet("acessonegado")]
         public IActionResult AcessoNegado() => Unauthorized("Acesso Negado - Perfil Insuficiente");
 
-        private string HashSenha(string senha) => 
+       [HttpGet("check")]
+public async Task<IActionResult> CheckAuth()
+{
+   if (!User.Identity.IsAuthenticated)
+        return Unauthorized();
+
+    // Obter ID do usuário a partir das claims
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    
+    // Buscar dados completos no banco se necessário
+    var usuario = await _contexto.Usuario
+        .Where(u => u.Id == userId)
+        .Select(u => new {
+            u.Email,
+            u.Nome,
+            u.Perfil
+        })
+        .FirstOrDefaultAsync();
+
+    return usuario == null 
+        ? Unauthorized() 
+        : Ok(usuario);
+}
+
+        private string HashSenha(string senha) =>
             Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(senha));
 
         private bool VerificarSenha(string senha, string hash) => 
@@ -103,6 +133,7 @@ namespace WikiAPI.Controllers
 
         public class LoginModel
         {
+            
             public required string Email { get; set; }
             public required string Senha { get; set; }
         }

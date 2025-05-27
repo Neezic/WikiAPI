@@ -8,12 +8,12 @@ using WikiAPI.Models;
 namespace WikiAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class ControllersAPI : ControllerBase
+    [Route("api/artigos")]
+    public class ArtigoControllers : ControllerBase
     {
         private readonly ContextoWiki _contexto;
 
-        public ControllersAPI(ContextoWiki contexto)
+        public ArtigoControllers(ContextoWiki contexto)
         {
             _contexto = contexto;
         }
@@ -36,6 +36,22 @@ namespace WikiAPI.Controllers
                 .FirstOrDefaultAsync();
 
             return artigo == null ? NotFound() : artigo;
+        }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ArtigoDto>>> ObterVariosArtigos()
+        {
+            return await _contexto.Artigo
+        .Include(a => a.Usuario)
+        .Select(a => new ArtigoDto
+        {
+            Id = a.Id,
+            Titulo = a.Titulo,
+            Conteudo = a.Conteudo,
+            DataCriacao = a.DataCriacao,
+            DataAtualizacao = a.DataAtualizacao,
+            Autor = a.Usuario != null ? a.Usuario.Nome : "Sistema"
+        })
+        .ToListAsync();
         }
 
         [HttpPut("{id}")]
