@@ -1,4 +1,4 @@
-const URL_API = "http://localhost:5073";
+const URL_API = "http://localhost:5073/";
 // Estado da aplicação
 const state = {
     user: null,

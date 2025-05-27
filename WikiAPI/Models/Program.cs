@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using WikiAPI;
 using WikiAPI.Data;
 using WikiAPI.Models;
-using System.Text.Encodings.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ContextoWiki>(options => options.UseSqlite(builder.Configuration.GetConnectionString("ContextoWiki")));
+// Configuração dos serviços
+builder.Services.AddDbContext<ContextoWiki>(options => 
+    options.UseSqlite(builder.Configuration.GetConnectionString("ContextoWiki")));
+
 builder.Services.AddAuthentication("cookieAuth")
     .AddCookie("cookieAuth", options =>
     {
@@ -18,29 +19,29 @@ builder.Services.AddAuthentication("cookieAuth")
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Editor", policy =>
-    policy.RequireAssertion(context =>
-    context.User.HasClaim(c =>
-    c.Type == "Perfil" && c.Value == "Editor")));
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c =>
+                c.Type == "Perfil" && c.Value == "Editor")));
 });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", builder =>
     {
-        builder.WithOrigins("http://localhost:5073/api")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+        builder.WithOrigins("http://localhost:5073") // Ajuste para o seu frontend
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers(); // Adiciona suporte a controllers
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuração do pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,16 +49,30 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.None,
     Secure = CookieSecurePolicy.Always
 });
 
+app.UseRouting();
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+// Rota raiz para verificar se a API está funcionando
+app.MapGet("/", () => "WikiAPI está funcionando! Acesse /swagger para a documentação da API.");
+
+// Seed inicial do banco de dados
 using (var escopo = app.Services.CreateScope())
 {
     var servicos = escopo.ServiceProvider;
     var contexto = servicos.GetRequiredService<ContextoWiki>();
+    
     if (!contexto.Usuario.Any(u => u.Email == "editor@wiki.com"))
     {
         contexto.Usuario.Add(new Usuario
@@ -71,7 +86,6 @@ using (var escopo = app.Services.CreateScope())
     }
     contexto.Database.EnsureCreated();
 }
-
 
 app.Run();
 
