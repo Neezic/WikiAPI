@@ -18,6 +18,7 @@ namespace WikiAPI.Controllers
         public AuthControllers(ContextoWiki contexto)
         {
             _contexto = contexto;
+            
         }
 
         [HttpPost("registrar")]
