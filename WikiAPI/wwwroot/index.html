@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WikiAPI</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="guest-section">
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Senha" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="user-section" style="display: none;">
+        <button id="logout-btn">Sair</button>
+        <div id="editor-actions" style="display: none;">
+            <button id="create-article-btn">Novo Artigo</button>
+        </div>
+        <div id="articles-container"></div>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>
